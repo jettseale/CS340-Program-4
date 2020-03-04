@@ -6,16 +6,17 @@
 int main (int argc, char* argv[]) {
 
     int input = atoi(argv[1]);
-    char randStr[input];
-    char charPool[27] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
-    int i;
+    char randStr[input + 1];
+    memset(randStr, '\0', input + 1);
 
-    memset(randStr, '\0', input);
+    char charPool[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
+    int i, num;
 
     srand(time(0));
 
     for (i = 0; i < input; i++) {
-        randStr[i] = charPool[rand() % 27];
+        num = rand() % 27;
+        randStr[i] = charPool[num];
     }
 
     printf("%s\n", randStr);
