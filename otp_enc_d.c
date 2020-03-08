@@ -8,13 +8,12 @@
 
 void error(const char *msg) { perror(msg); exit(1); } // Error function used for reporting issues
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	int listenSocketFD, establishedConnectionFD, portNumber, charsRead;
 	socklen_t sizeOfClientInfo;
 	char buffer[256];
 	struct sockaddr_in serverAddress, clientAddress;
-
+	pid_t childPid;
 	if (argc < 2) { fprintf(stderr,"USAGE: %s port\n", argv[0]); exit(1); } // Check usage & args
 
 	// Set up the address struct for this process (the server)
@@ -31,23 +30,32 @@ int main(int argc, char *argv[])
 	// Enable the socket to begin listening
 	if (bind(listenSocketFD, (struct sockaddr *)&serverAddress, sizeof(serverAddress)) < 0) // Connect socket to port
 		error("ERROR on binding");
+
 	listen(listenSocketFD, 5); // Flip the socket on - it can now receive up to 5 connections
 
-	// Accept a connection, blocking if one is not available until one connects
-	sizeOfClientInfo = sizeof(clientAddress); // Get the size of the address for the client that will connect
-	establishedConnectionFD = accept(listenSocketFD, (struct sockaddr *)&clientAddress, &sizeOfClientInfo); // Accept
-	if (establishedConnectionFD < 0) error("ERROR on accept");
+	while (1) {
+		// Accept a connection, blocking if one is not available until one connects
+		sizeOfClientInfo = sizeof(clientAddress); // Get the size of the address for the client that will connect
+		establishedConnectionFD = accept(listenSocketFD, (struct sockaddr *)&clientAddress, &sizeOfClientInfo); // Accept
+		if (establishedConnectionFD < 0) error("ERROR on accept");
 
-	// Get the message from the client and display it
-	memset(buffer, '\0', 256);
-	charsRead = recv(establishedConnectionFD, buffer, 255, 0); // Read the client's message from the socket
-	if (charsRead < 0) error("ERROR reading from socket");
-	printf("SERVER: I received this from the client: \"%s\"\n", buffer);
+		//Fork new child process
+		if ((childPid = fork()) == 0) {
+			while (1) {
+				// Get the message from the client and display it
+				memset(buffer, '\0', 256);
+				charsRead = recv(establishedConnectionFD, buffer, 255, 0); // Read the client's message from the socket
+				if (charsRead < 0) error("ERROR reading from socket");
+				if (charsRead == 0) break;
+				printf("SERVER: I received this from the client: \"%s\"\n", buffer);
 
-	// Send a Success message back to the client
-	charsRead = send(establishedConnectionFD, "I am the server, and I got your message", 39, 0); // Send success back
-	if (charsRead < 0) error("ERROR writing to socket");
+				// Send a Success message back to the client
+				charsRead = send(establishedConnectionFD, "I am the server, and I got your message", 39, 0); // Send success back
+				if (charsRead < 0) error("ERROR writing to socket");
+			}
+		}
+	}
 	close(establishedConnectionFD); // Close the existing socket which is connected to the client
 	close(listenSocketFD); // Close the listening socket
-	return 0; 
+	return 0;
 }

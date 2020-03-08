@@ -10,13 +10,12 @@ int main (int argc, char* argv[]) {
     memset(randStr, '\0', input + 1);
 
     char charPool[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ ";
-    int i, num;
+    int i;
 
     srand(time(0));
 
     for (i = 0; i < input; i++) {
-        num = rand() % 27;
-        randStr[i] = charPool[num];
+        randStr[i] = charPool[rand() % 27];
     }
 
     printf("%s\n", randStr);
