@@ -31,9 +31,9 @@ int main(int argc, char *argv[])
 	memset(buffer, '\0', NAME_MAX + 1);
 	
 	char plainTextContents[NAME_MAX + 1];
-	char keyContents[NAME_MAX + 1];
+	char keyContents[70001];
 	memset(plainTextContents, '\0', NAME_MAX + 1);
-	memset(keyContents, '\0', NAME_MAX + 1);
+	memset(keyContents, '\0', 70001);
 	char c;
 	int i = 1;
 	int isNL = 0;
@@ -55,6 +55,15 @@ int main(int argc, char *argv[])
 	}
 	fclose(plainTextFile);
 
+	// Remove the newline from the end of the plain text
+	i = 0;
+	for (i = 0; i < NAME_MAX + 1 && !isNL; i++) { // Loops through the user input and deletes the first newline found
+        if (plainTextContents[i] == '\n') {
+            plainTextContents[i] = '\0'; // Replace newline with NULL terminator
+            isNL = 1;
+        }
+    }
+
 	// Grab the key contents
 	c = '\0';
 	i = 1;
@@ -74,7 +83,8 @@ int main(int argc, char *argv[])
 
 	// Remove the newline from the end of the key
 	i = 0;
-	for (i = 0; i < NAME_MAX + 1 && !isNL; i++) { // Loops through the user input and deletes the first newline found
+	isNL = 0;
+	for (i = 0; i < 70001 && !isNL; i++) { // Loops through the user input and deletes the first newline found
         if (keyContents[i] == '\n') {
             keyContents[i] = '\0'; // Replace newline with NULL terminator
             isNL = 1;

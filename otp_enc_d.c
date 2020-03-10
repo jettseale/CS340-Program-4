@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
 				} else if (i == 2) {
 					strcpy(keyText, buffer);
 					encrypt(plainText, keyText);
-					charsRead = send(establishedConnectionFD, encryptedText, strlen(encryptedText) - 1, 0);
+					charsRead = send(establishedConnectionFD, encryptedText, strlen(encryptedText), 0);
 					if (charsRead < 0) error("ERROR writing to socket");
 				}
 			}
