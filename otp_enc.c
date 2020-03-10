@@ -81,8 +81,11 @@ int main(int argc, char *argv[])
         }
     }
 
-	// Make sure the key and the plain text are the same length
-
+	// Make sure the key is long enough for the plain text
+	if (strlen(keyContents) < (strlen(plainTextContents) - 1)) {
+		fprintf(stderr, "ERROR: The key you entered is too short.\n");
+		exit(1);
+	}
     
 	// Set up the server address struct
 	memset((char*)&serverAddress, '\0', sizeof(serverAddress)); // Clear out the address struct
@@ -106,11 +109,10 @@ int main(int argc, char *argv[])
 	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
 	if (charsWritten < strlen(plainTextContents)) printf("CLIENT: WARNING: Not all data written to socket!\n");
 
-	// Get return message from server
+	// // Get return message from server
 	memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer again for reuse
 	charsRead = recv(socketFD, buffer, sizeof(buffer) - 1, 0); // Read data from the socket, leaving \0 at end
 	if (charsRead < 0) error("CLIENT: ERROR reading from socket");
-	printf("CLIENT: I received this from the server: \"%s\"\n", buffer);
 
 	// Send message to server
 	charsWritten = send(socketFD, keyContents, strlen(keyContents), 0); // Write to the server
@@ -121,7 +123,8 @@ int main(int argc, char *argv[])
 	memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer again for reuse
 	charsRead = recv(socketFD, buffer, sizeof(buffer) - 1, 0); // Read data from the socket, leaving \0 at end
 	if (charsRead < 0) error("CLIENT: ERROR reading from socket");
-	printf("CLIENT: I received this from the server: \"%s\"\n", buffer);
+	
+	printf("%s\n", buffer);
 
 	close(socketFD); // Close the socket
 	
