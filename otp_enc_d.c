@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
 				if (i == 1) {
 					strcpy(plainText, buffer);
 					//Send a Success message back to the client
-					charsRead = send(establishedConnectionFD, "I am the server, and I got your message", 39, 0); // Send success back
+					charsRead = send(establishedConnectionFD, "I'm otp_enc_d.c", 15, 0); // Send success back
 					if (charsRead < 0) error("ERROR writing to socket");
 				} else if (i == 2) {
 					strcpy(keyText, buffer);

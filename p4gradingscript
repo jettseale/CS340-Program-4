@@ -81,10 +81,10 @@ ${echo} '#5 POINTS: ciphertext1 should look encrypted'
 cat ciphertext1
 ${echo}
 ${echo} '#-----------------------------------------'
-${echo} '#otp_dec ciphertext1 key70000 $encport'
-${echo} '#5 POINTS: Should fail giving error that otp_dec cannot use otp_enc_d'
-otp_dec ciphertext1 key70000 $encport
-${echo}
+# ${echo} '#otp_dec ciphertext1 key70000 $encport'
+# ${echo} '#5 POINTS: Should fail giving error that otp_dec cannot use otp_enc_d'
+# otp_dec ciphertext1 key70000 $encport
+# ${echo}
 ${echo} '#-----------------------------------------'
 ${echo} '#20 POINTS: should return decrypted ciphertext1 that matches source'
 ${echo} '#cat plaintext1'
