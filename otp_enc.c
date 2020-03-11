@@ -30,9 +30,9 @@ int main(int argc, char *argv[])
 	char buffer[NAME_MAX + 1];
 	memset(buffer, '\0', NAME_MAX + 1);
 	
-	char plainTextContents[NAME_MAX + 1];
+	char plainTextContents[69334];
 	char keyContents[70001];
-	memset(plainTextContents, '\0', NAME_MAX + 1);
+	memset(plainTextContents, '\0', 69334);
 	memset(keyContents, '\0', 70001);
 	char c;
 	int i = 1;
@@ -55,14 +55,9 @@ int main(int argc, char *argv[])
 	}
 	fclose(plainTextFile);
 
-	// Remove the newline from the end of the plain text
-	i = 0;
-	for (i = 0; i < NAME_MAX + 1 && !isNL; i++) { // Loops through the user input and deletes the first newline found
-        if (plainTextContents[i] == '\n') {
-            plainTextContents[i] = '\0'; // Replace newline with NULL terminator
-            isNL = 1;
-        }
-    }
+	if (plainTextContents[strlen(plainTextContents) - 2] == '\n') {
+		plainTextContents[strlen(plainTextContents) - 2] = '\0';
+	}
 
 	// Grab the key contents
 	c = '\0';
@@ -81,20 +76,29 @@ int main(int argc, char *argv[])
 	}
 	fclose(keyFile);
 
-	// Remove the newline from the end of the key
-	i = 0;
-	isNL = 0;
-	for (i = 0; i < 70001 && !isNL; i++) { // Loops through the user input and deletes the first newline found
-        if (keyContents[i] == '\n') {
-            keyContents[i] = '\0'; // Replace newline with NULL terminator
-            isNL = 1;
-        }
-    }
+	if (keyContents[strlen(keyContents) - 2] == '\n') {
+		keyContents[strlen(keyContents) - 2] = '\0';
+	}
 
 	// Make sure the key is long enough for the plain text
 	if (strlen(keyContents) < (strlen(plainTextContents) - 1)) {
 		fprintf(stderr, "ERROR: The key you entered is too short.\n");
 		exit(1);
+	}
+
+	//Make sure there are no bad characters
+	for (i = 0; i < strlen(plainTextContents); i++) {
+		if ((int)plainTextContents[i] > 90 || (int)plainTextContents[i] < 65 && (int)plainTextContents[i] != 32) {
+			fprintf(stderr, "ERROR: There are bad characters in the provided plain text file.\n");
+			exit(1);
+		}
+	}
+
+	for (i = 0; i < strlen(keyContents); i++) {
+		if ((int)keyContents[i] > 90 || (int)keyContents[i] < 65 && (int)keyContents[i] != 32) {
+			fprintf(stderr, "ERROR: There are bad characters in the provided key file.\n");
+			exit(1);
+		}
 	}
     
 	// Set up the server address struct
