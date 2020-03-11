@@ -24,7 +24,7 @@ ERROR: The key you entered is too short.
 #-----------------------------------------
 #otp_enc plaintext1 key70000 $encport
 #20 POINTS: Should return encrypted version of plaintext1
-HUXWKWOJLCOAVSBOLBTLEYKWJKDVASMIPFUG
+HMPUIRHTKNPWIEQPZAWGNDMQLFHUDKPMPPVD
 
 #-----------------------------------------
 #otp_enc plaintext1 key70000 $encport > ciphertext1
@@ -40,9 +40,14 @@ ciphertext1 exists!
 
 #-----------------------------------------
 #5 POINTS: ciphertext1 should look encrypted
-HUXWKWOJLCOAVSBOLBTLEYKWJKDVASMIPFUG
+HMPUIRHTKNPWIEQPZAWGNDMQLFHUDKPMPPVD
 
 #-----------------------------------------
+#otp_dec ciphertext1 key70000 $encport
+#5 POINTS: Should fail giving error that otp_dec cannot use otp_enc_d
+ERROR: otp_dec.c cannot connect to otp_enc_d.c
+Attempted port: 58133
+
 #-----------------------------------------
 #20 POINTS: should return decrypted ciphertext1 that matches source
 #cat plaintext1
@@ -65,86 +70,81 @@ plaintext1_a exists!
 #20 POINTS: concurrent test of encryption - look for 4 properly-sized ciphertext# files, or 5 where the 5th is 0 bytes
 #5 POINTS: Should be only one error about plaintext5 being bad
 Ten second sleep, your program must complete in this time
-./p4gradingscript: line 120: 31525 Segmentation fault      (core dumped) otp_enc plaintext4 key70000 $encport > ciphertext4
-total 1488
-drwxrwx---. 3 sealee upg4619   746 Mar  9 22:10 ./
+./p4gradingscript: line 120: 14860 Segmentation fault      (core dumped) otp_enc plaintext4 key70000 $encport > ciphertext4
+total 1704
+drwxrwx---. 3 sealee upg4619   760 Mar 10 21:20 ./
 drwxrwx---. 7 sealee upg4619   137 Mar  2 17:47 ../
--rw-rw----. 1 sealee upg4619    37 Mar  9 21:47 cipher-results
--rw-rw----. 1 sealee upg4619     0 Mar  9 22:10 ciphertext1
--rw-rw----. 1 sealee upg4619     0 Mar  9 22:10 ciphertext2
--rw-rw----. 1 sealee upg4619     0 Mar  9 22:10 ciphertext3
--rw-rw----. 1 sealee upg4619     0 Mar  9 22:10 ciphertext4
--rw-rw----. 1 sealee upg4619     0 Mar  9 22:10 ciphertext5
+-rw-rw----. 1 sealee upg4619    37 Mar 10 21:20 ciphertext1
+-rw-rw----. 1 sealee upg4619    16 Mar 10 21:20 ciphertext2
+-rw-rw----. 1 sealee upg4619    17 Mar 10 21:20 ciphertext3
+-rw-rw----. 1 sealee upg4619     0 Mar 10 21:20 ciphertext4
+-rw-rw----. 1 sealee upg4619    42 Mar 10 21:20 ciphertext5
 -rwx--x---. 1 sealee upg4619   142 Mar  5 16:18 compileall
-drwxrwx---. 8 sealee upg4619   325 Mar  9 21:28 .git/
--rw-rw----. 1 sealee upg4619    21 Mar  9 22:10 key20
--rw-rw----. 1 sealee upg4619 70001 Mar  9 22:10 key70000
--rwxrwx---. 1 sealee upg4619  8720 Mar  9 22:10 keygen
+drwxrwx---. 8 sealee upg4619   325 Mar  9 22:14 .git/
+-rw-rw----. 1 sealee upg4619 70001 Mar 10 20:48 key
+-rw-rw----. 1 sealee upg4619    21 Mar 10 21:20 key20
+-rw-rw----. 1 sealee upg4619 70001 Mar 10 21:20 key70000
+-rwxrwx---. 1 sealee upg4619  8720 Mar 10 21:20 keygen
 -rw-rw----. 1 sealee upg4619   453 Mar  3 22:57 keygen.c
--rw-rw----. 1 sealee upg4619  2390 Mar  9 22:10 mytestresults
--rwxrwx---. 1 sealee upg4619 13616 Mar  9 22:10 otp_dec
--rwxrwx---. 1 sealee upg4619  5243 Mar  9 22:06 otp_dec.c
--rwxrwx---. 1 sealee upg4619 13440 Mar  9 22:10 otp_dec_d
--rwxrwx---. 1 sealee upg4619  3996 Mar  9 21:46 otp_dec_d.c
--rwxrwx---. 1 sealee upg4619 13512 Mar  9 22:10 otp_enc
--rwx------. 1 sealee upg4619  5058 Mar  9 20:42 otp_enc.c
--rwxrwx---. 1 sealee upg4619 13440 Mar  9 22:10 otp_enc_d
--rwxrwx---. 1 sealee upg4619  3973 Mar  9 21:58 otp_enc_d.c
--rwx------. 1 sealee upg4619  5092 Mar  9 22:10 p4gradingscript
--rwx------. 1 sealee upg4619    37 Mar  9 20:51 plaintext1
--rwx------. 1 sealee upg4619   317 Mar  9 20:51 plaintext2
--rwx------. 1 sealee upg4619    17 Mar  9 20:51 plaintext3
--rwx------. 1 sealee upg4619 69333 Mar  9 20:51 plaintext4
--rwx------. 1 sealee upg4619    42 Mar  9 20:51 plaintext5
+-rw-rw----. 1 sealee upg4619  2569 Mar 10  2020 mytestresults
+-rwxrwx---. 1 sealee upg4619 13616 Mar 10 21:20 otp_dec
+-rwxrwx---. 1 sealee upg4619  5470 Mar 10 18:56 otp_dec.c
+-rwxrwx---. 1 sealee upg4619 13600 Mar 10 21:20 otp_dec_d
+-rwxrwx---. 1 sealee upg4619  4353 Mar 10 21:17 otp_dec_d.c
+-rwxrwx---. 1 sealee upg4619 13512 Mar 10 21:20 otp_enc
+-rwx------. 1 sealee upg4619  5058 Mar 10 20:35 otp_enc.c
+-rwxrwx---. 1 sealee upg4619 13600 Mar 10 21:20 otp_enc_d
+-rwxrwx---. 1 sealee upg4619  4356 Mar 10 21:00 otp_enc_d.c
+-rwx------. 1 sealee upg4619  5084 Mar  9 22:17 p4gradingscript
+-rwx------. 1 sealee upg4619    37 Mar 10 20:40 plaintext1
+-rwx------. 1 sealee upg4619   317 Mar 10 20:40 plaintext2
+-rwx------. 1 sealee upg4619    17 Mar 10 20:40 plaintext3
+-rwx------. 1 sealee upg4619 69333 Mar 10 20:40 plaintext4
+-rwx------. 1 sealee upg4619    42 Mar 10 20:40 plaintext5
+-rw-rw----. 1 sealee upg4619    37 Mar 10 21:13 results
 
 #-----------------------------------------
 #15 POINTS: concurrent test of decryption - look for 4 plaintext#_a files that match the plaintext# files
 #Ten second sleep, your program must complete in this time
-total 1824
-drwxrwx---. 3 sealee upg4619   866 Mar  9 22:10 ./
+total 2160
+drwxrwx---. 3 sealee upg4619   880 Mar 10 21:20 ./
 drwxrwx---. 7 sealee upg4619   137 Mar  2 17:47 ../
--rw-rw----. 1 sealee upg4619    37 Mar  9 21:47 cipher-results
--rw-rw----. 1 sealee upg4619     0 Mar  9 22:10 ciphertext1
--rw-rw----. 1 sealee upg4619     0 Mar  9 22:10 ciphertext2
--rw-rw----. 1 sealee upg4619     0 Mar  9 22:10 ciphertext3
--rw-rw----. 1 sealee upg4619     0 Mar  9 22:10 ciphertext4
--rw-rw----. 1 sealee upg4619     0 Mar  9 22:10 ciphertext5
+-rw-rw----. 1 sealee upg4619    37 Mar 10 21:20 ciphertext1
+-rw-rw----. 1 sealee upg4619    16 Mar 10 21:20 ciphertext2
+-rw-rw----. 1 sealee upg4619    17 Mar 10 21:20 ciphertext3
+-rw-rw----. 1 sealee upg4619     0 Mar 10 21:20 ciphertext4
+-rw-rw----. 1 sealee upg4619    42 Mar 10 21:20 ciphertext5
 -rwx--x---. 1 sealee upg4619   142 Mar  5 16:18 compileall
-drwxrwx---. 8 sealee upg4619   325 Mar  9 21:28 .git/
--rw-rw----. 1 sealee upg4619    21 Mar  9 22:10 key20
--rw-rw----. 1 sealee upg4619 70001 Mar  9 22:10 key70000
--rwxrwx---. 1 sealee upg4619  8720 Mar  9 22:10 keygen
+drwxrwx---. 8 sealee upg4619   325 Mar  9 22:14 .git/
+-rw-rw----. 1 sealee upg4619 70001 Mar 10 20:48 key
+-rw-rw----. 1 sealee upg4619    21 Mar 10 21:20 key20
+-rw-rw----. 1 sealee upg4619 70001 Mar 10 21:20 key70000
+-rwxrwx---. 1 sealee upg4619  8720 Mar 10 21:20 keygen
 -rw-rw----. 1 sealee upg4619   453 Mar  3 22:57 keygen.c
--rw-rw----. 1 sealee upg4619  4297 Mar  9 22:10 mytestresults
--rwxrwx---. 1 sealee upg4619 13616 Mar  9 22:10 otp_dec
--rwxrwx---. 1 sealee upg4619  5243 Mar  9 22:06 otp_dec.c
--rwxrwx---. 1 sealee upg4619 13440 Mar  9 22:10 otp_dec_d
--rwxrwx---. 1 sealee upg4619  3996 Mar  9 21:46 otp_dec_d.c
--rwxrwx---. 1 sealee upg4619 13512 Mar  9 22:10 otp_enc
--rwx------. 1 sealee upg4619  5058 Mar  9 20:42 otp_enc.c
--rwxrwx---. 1 sealee upg4619 13440 Mar  9 22:10 otp_enc_d
--rwxrwx---. 1 sealee upg4619  3973 Mar  9 21:58 otp_enc_d.c
--rwx------. 1 sealee upg4619  5092 Mar  9 22:10 p4gradingscript
--rwx------. 1 sealee upg4619    37 Mar  9 20:51 plaintext1
--rw-rw----. 1 sealee upg4619     2 Mar  9 22:10 plaintext1_a
--rwx------. 1 sealee upg4619   317 Mar  9 20:51 plaintext2
--rw-rw----. 1 sealee upg4619     0 Mar  9 22:10 plaintext2_a
--rwx------. 1 sealee upg4619    17 Mar  9 20:51 plaintext3
--rw-rw----. 1 sealee upg4619     0 Mar  9 22:10 plaintext3_a
--rwx------. 1 sealee upg4619 69333 Mar  9 20:51 plaintext4
--rw-rw----. 1 sealee upg4619     0 Mar  9 22:10 plaintext4_a
--rwx------. 1 sealee upg4619    42 Mar  9 20:51 plaintext5
+-rw-rw----. 1 sealee upg4619  4521 Mar 10 21:20 mytestresults
+-rwxrwx---. 1 sealee upg4619 13616 Mar 10 21:20 otp_dec
+-rwxrwx---. 1 sealee upg4619  5470 Mar 10 18:56 otp_dec.c
+-rwxrwx---. 1 sealee upg4619 13600 Mar 10 21:20 otp_dec_d
+-rwxrwx---. 1 sealee upg4619  4353 Mar 10 21:17 otp_dec_d.c
+-rwxrwx---. 1 sealee upg4619 13512 Mar 10 21:20 otp_enc
+-rwx------. 1 sealee upg4619  5058 Mar 10 20:35 otp_enc.c
+-rwxrwx---. 1 sealee upg4619 13600 Mar 10 21:20 otp_enc_d
+-rwxrwx---. 1 sealee upg4619  4356 Mar 10 21:00 otp_enc_d.c
+-rwx------. 1 sealee upg4619  5084 Mar  9 22:17 p4gradingscript
+-rwx------. 1 sealee upg4619    37 Mar 10 20:40 plaintext1
+-rw-rw----. 1 sealee upg4619    37 Mar 10 21:20 plaintext1_a
+-rwx------. 1 sealee upg4619   317 Mar 10 20:40 plaintext2
+-rw-rw----. 1 sealee upg4619    16 Mar 10 21:20 plaintext2_a
+-rwx------. 1 sealee upg4619    17 Mar 10 20:40 plaintext3
+-rw-rw----. 1 sealee upg4619    17 Mar 10 21:20 plaintext3_a
+-rwx------. 1 sealee upg4619 69333 Mar 10 20:40 plaintext4
+-rw-rw----. 1 sealee upg4619     2 Mar 10 21:20 plaintext4_a
+-rwx------. 1 sealee upg4619    42 Mar 10 20:40 plaintext5
+-rw-rw----. 1 sealee upg4619    37 Mar 10 21:13 results
 
 #-----------------------------------------
 #Cleaning up - ignore Operation Not Permitted errors
-./p4gradingscript: line 137: 31426 Terminated              otp_enc_d $encport
-./p4gradingscript: line 137: 31427 Terminated              otp_dec_d $decport
-./p4gradingscript: line 137: 31522 Terminated              otp_enc plaintext1 key70000 $encport > ciphertext1
-./p4gradingscript: line 137: 31523 Terminated              otp_enc plaintext2 key70000 $encport > ciphertext2
-./p4gradingscript: line 137: 31524 Terminated              otp_enc plaintext3 key70000 $encport > ciphertext3
-./p4gradingscript: line 137: 31526 Terminated              otp_enc plaintext5 key70000 $encport > ciphertext5
-./p4gradingscript: line 137: 31608 Terminated              otp_dec ciphertext2 key70000 $decport > plaintext2_a
-./p4gradingscript: line 137: 31609 Terminated              otp_dec ciphertext3 key70000 $decport > plaintext3_a
-./p4gradingscript: line 137: 31610 Terminated              otp_dec ciphertext4 key70000 $decport > plaintext4_a
+./p4gradingscript: line 137: 14748 Terminated              otp_enc_d $encport
+./p4gradingscript: line 137: 14749 Terminated              otp_dec_d $decport
 
 #SCRIPT COMPLETE

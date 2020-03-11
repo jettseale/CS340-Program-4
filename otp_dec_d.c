@@ -45,7 +45,8 @@ int main(int argc, char *argv[]) {
 	socklen_t sizeOfClientInfo;
 	char buffer[256];
 	struct sockaddr_in serverAddress, clientAddress;
-	pid_t childPid;
+	pid_t childPid = -5;
+	int childExitStatus = -5;
 	char plainText[NAME_MAX + 1];
 	char keyText[NAME_MAX + 1];
 	memset(plainText, '\0', NAME_MAX + 1);
@@ -78,30 +79,48 @@ int main(int argc, char *argv[]) {
 		if (establishedConnectionFD < 0) error("ERROR on accept");
 
 		//Fork new child process
-		if ((childPid = fork()) == 0) {
-			while (1) {
-				// Get the message from the client and display it
-				memset(buffer, '\0', 256);
-				charsRead = recv(establishedConnectionFD, buffer, 255, 0); // Read the client's message from the socket
-				if (charsRead < 0) error("ERROR reading from socket");
-				if (charsRead == 0) break;
-				// printf("SERVER: I received this from the client: \"%s\"\n", buffer);
-				i++;
-				if (i == 1) {
-					strcpy(plainText, buffer);
-					//Send a Success message back to the client
-					charsRead = send(establishedConnectionFD, "I am the server, and I got your message", 39, 0); // Send success back
-					if (charsRead < 0) error("ERROR writing to socket");
-				} else if (i == 2) {
-					strcpy(keyText, buffer);
-					encrypt(plainText, keyText);
-					charsRead = send(establishedConnectionFD, encryptedText, strlen(encryptedText), 0);
-					if (charsRead < 0) error("ERROR writing to socket");
+		childPid = fork();
+		switch (childPid) {
+			case -1:
+				error("ERROR forking");
+				break;
+		
+			case 0:
+			i = 0;
+				while (1) {
+					// Get the message from the client and display it
+					memset(buffer, '\0', 256);
+					charsRead = recv(establishedConnectionFD, buffer, 255, 0); // Read the client's message from the socket
+					if (charsRead < 0) error("ERROR reading from socket");
+					if (charsRead == 0) break;
+					// printf("SERVER: I received this from the client: \"%s\"\n", buffer);
+					i++;
+					if (i == 1) {
+						strcpy(plainText, buffer);
+						//Send a Success message back to the client
+						charsRead = send(establishedConnectionFD, "I'm otp_dec_d.c", 15, 0); // Send success back
+						if (charsRead < 0) error("ERROR writing to socket");
+					} else if (i == 2) {
+						if (!strcmp(buffer, "No connection for you, buddy")) {
+							break;
+						}
+						strcpy(keyText, buffer);
+						encrypt(plainText, keyText);
+						charsRead = send(establishedConnectionFD, encryptedText, strlen(encryptedText), 0);
+						if (charsRead < 0) error("ERROR writing to socket");
+						break;
+					}
 				}
-			}
+				break;
+			
+			default:
+				waitpid(childPid, &childExitStatus, 0);
+				close(establishedConnectionFD); // Close the existing socket which is connected to the client
+				childPid = -5;
+				childExitStatus = -5;
+				break;
 		}
 	}
-	close(establishedConnectionFD); // Close the existing socket which is connected to the client
 	close(listenSocketFD); // Close the listening socket
 	return 0;
 }

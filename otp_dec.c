@@ -124,7 +124,10 @@ int main(int argc, char *argv[])
 	charsRead = recv(socketFD, buffer, sizeof(buffer) - 1, 0); // Read data from the socket, leaving \0 at end
 	if (charsRead < 0) error("CLIENT: ERROR reading from socket");
 	if (!strcmp(buffer, "I'm otp_enc_d.c")) {
-		fprintf(stderr, "ERROR: otp_dec.c cannot connect to otp_enc_d.c.\nAttempted port: %d\n", portNumber);
+		fprintf(stderr, "ERROR: otp_dec.c cannot connect to otp_enc_d.c\nAttempted port: %d\n", portNumber);
+		charsWritten = send(socketFD, "No connection for you, buddy", 28, 0);
+		if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
+		if (charsWritten < 28) printf("CLIENT: WARNING: Not all data written to socket!\n");
 		close(socketFD);
 		exit(2);
 	}
