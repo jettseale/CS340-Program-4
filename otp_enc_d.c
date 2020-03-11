@@ -6,13 +6,25 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <limits.h>
+#include <stdbool.h>
 #include <string.h>
 
-char encryptedText[NAME_MAX + 1];
+bool sendAll (int socket, void *buffer, size_t length) {
+	char* ptr = (char*)buffer;
+	while (length > 0) {
+		int i = send(socket, ptr, length, 0);
+        if (i < 1) return false;
+        ptr += i;
+        length -= i;
+	}
+	return true;
+}
 
-void encrypt (char plainText[NAME_MAX + 1], char keyText[NAME_MAX + 1]) {
-	int i, textNum, keyNum, encryptNum;
-	memset(encryptedText, '\0', NAME_MAX + 1);
+char encryptedText[70001];
+
+void encrypt (char plainText[70001], char keyText[70001]) {
+	int i = 0, textNum = 0, keyNum = 0, encryptNum = 0;
+	memset(encryptedText, '\0', 70001);
 
 	for (i = 0; plainText[i]; i++) {
 		if (plainText[i] != ' ') {
@@ -43,14 +55,14 @@ void error(const char *msg) { perror(msg); exit(1); } // Error function used for
 int main(int argc, char *argv[]) {
 	int listenSocketFD, establishedConnectionFD, portNumber, charsRead;
 	socklen_t sizeOfClientInfo;
-	char buffer[256];
+	char buffer[70001];
 	struct sockaddr_in serverAddress, clientAddress;
 	pid_t childPid = -5;
 	int childExitStatus = -5;
-	char plainText[NAME_MAX + 1];
-	char keyText[NAME_MAX + 1];
-	memset(plainText, '\0', NAME_MAX + 1);
-	memset(keyText, '\0', NAME_MAX + 1);
+	char plainText[70001];
+	char keyText[70001];
+	memset(plainText, '\0', 70001);
+	memset(keyText, '\0', 70001);
 	int i = 0;
 
 	if (argc < 2) { fprintf(stderr,"USAGE: %s port\n", argv[0]); exit(1); } // Check usage & args
@@ -89,24 +101,29 @@ int main(int argc, char *argv[]) {
 				i = 0;
 				while (1) {
 					// Get the message from the client and display it
-					memset(buffer, '\0', 256);
-					charsRead = recv(establishedConnectionFD, buffer, 255, 0); // Read the client's message from the socket
+					memset(buffer, '\0', 70001);
+					charsRead = recv(establishedConnectionFD, buffer, 70001, 0); // Read the client's message from the socket
 					if (charsRead < 0) error("ERROR reading from socket");
 					if (charsRead == 0) break;
-					// printf("SERVER: I received this from the client: \"%s\"\n", buffer);
 					i++;
 					if (i == 1) {
+						memset(plainText, '\0', 70001);
+						// printf("SERVER: Length of string recieved: %d\n", strlen(buffer));
 						strcpy(plainText, buffer);
+						// printf("SERVER: Length of string copied: %d\n", strlen(plainText));
 						//Send a Success message back to the client
-						charsRead = send(establishedConnectionFD, "I'm otp_enc_d.c", 15, 0); // Send success back
+						charsRead = sendAll(establishedConnectionFD, "I'm otp_enc_d.c", 15); // Send success back
 						if (charsRead < 0) error("ERROR writing to socket");
 					} else if (i == 2) {
 						if (!strcmp(buffer, "No connection for you, buddy")) {
 							break;
 						}
+						memset(keyText, '\0', 70001);
+						// printf("SERVER: Length of string recieved: %d\n", strlen(buffer));
 						strcpy(keyText, buffer);
+						// printf("SERVER: Length of string copied: %d\n", strlen(keyText));
 						encrypt(plainText, keyText);
-						charsRead = send(establishedConnectionFD, encryptedText, strlen(encryptedText), 0);
+						charsRead = sendAll(establishedConnectionFD, encryptedText, strlen(encryptedText));
 						if (charsRead < 0) error("ERROR writing to socket");
 						break;
 					}

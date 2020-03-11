@@ -7,6 +7,18 @@
 #include <netinet/in.h>
 #include <netdb.h> 
 #include <limits.h>
+#include <stdbool.h>
+
+bool sendAll (int socket, void *buffer, size_t length) {
+	char* ptr = (char*)buffer;
+	while (length > 0) {
+		int i = send(socket, ptr, length, 0);
+        if (i < 1) return false;
+        ptr += i;
+        length -= i;
+	}
+	return true;
+}
 
 void error(const char *msg) { perror(msg); exit(0); } // Error function used for reporting issues
 
@@ -27,12 +39,12 @@ int main(int argc, char *argv[])
 	int socketFD, portNumber, charsWritten, charsRead;
 	struct sockaddr_in serverAddress;
 	struct hostent* serverHostInfo;
-	char buffer[NAME_MAX + 1];
-	memset(buffer, '\0', NAME_MAX + 1);
+	char buffer[70001];
+	memset(buffer, '\0', 70001);
 	
-	char plainTextContents[69334];
+	char plainTextContents[70001];
 	char keyContents[70001];
-	memset(plainTextContents, '\0', 69334);
+	memset(plainTextContents, '\0', 70001);
 	memset(keyContents, '\0', 70001);
 	char c;
 	int i = 1;
@@ -55,6 +67,7 @@ int main(int argc, char *argv[])
 	}
 	fclose(plainTextFile);
 
+	// Remove the newline from the end of the plain text
 	if (plainTextContents[strlen(plainTextContents) - 2] == '\n') {
 		plainTextContents[strlen(plainTextContents) - 2] = '\0';
 	}
@@ -76,6 +89,7 @@ int main(int argc, char *argv[])
 	}
 	fclose(keyFile);
 
+	// Remove the newline from the end of the key
 	if (keyContents[strlen(keyContents) - 2] == '\n') {
 		keyContents[strlen(keyContents) - 2] = '\0';
 	}
@@ -118,20 +132,22 @@ int main(int argc, char *argv[])
 	if (connect(socketFD, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) // Connect socket to address
 		error("CLIENT: ERROR connecting");
 
+	// printf("CLIENT: Length of string to be sent: %d\n", strlen(plainTextContents));
 	// Send message to server
-	charsWritten = send(socketFD, plainTextContents, strlen(plainTextContents), 0); // Write to the server
+	charsWritten = sendAll(socketFD, plainTextContents, strlen(plainTextContents)); // Write to the server
 	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
-	if (charsWritten < strlen(plainTextContents)) printf("CLIENT: WARNING: Not all data written to socket!\n");
+	// if (charsWritten < strlen(plainTextContents)) printf("CLIENT: WARNING: Not all data written to socket!\n");
 
 	// // Get return message from server
 	memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer again for reuse
 	charsRead = recv(socketFD, buffer, sizeof(buffer) - 1, 0); // Read data from the socket, leaving \0 at end
 	if (charsRead < 0) error("CLIENT: ERROR reading from socket");
 
+	// printf("CLIENT: Length of string to be sent: %d\n", strlen(keyContents));
 	// Send message to server
-	charsWritten = send(socketFD, keyContents, strlen(keyContents), 0); // Write to the server
+	charsWritten = sendAll(socketFD, keyContents, strlen(keyContents)); // Write to the server
 	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
-	if (charsWritten < strlen(keyContents)) printf("CLIENT: WARNING: Not all data written to socket!\n");
+	// if (charsWritten < strlen(keyContents)) printf("CLIENT: WARNING: Not all data written to socket!\n");
 
 	// Get return message from server
 	memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer again for reuse
