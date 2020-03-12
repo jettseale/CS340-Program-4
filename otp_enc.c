@@ -9,17 +9,6 @@
 #include <limits.h>
 #include <stdbool.h>
 
-bool sendAll (int socket, void *buffer, size_t length) {
-	char* ptr = (char*)buffer;
-	while (length > 0) {
-		int i = send(socket, ptr, length, 0);
-        if (i < 1) return false;
-        ptr += i;
-        length -= i;
-	}
-	return true;
-}
-
 void error(const char *msg) { perror(msg); exit(0); } // Error function used for reporting issues
 
 int main(int argc, char *argv[])
@@ -134,7 +123,7 @@ int main(int argc, char *argv[])
 
 	// printf("CLIENT: Length of string to be sent: %d\n", strlen(plainTextContents));
 	// Send message to server
-	charsWritten = sendAll(socketFD, plainTextContents, strlen(plainTextContents)); // Write to the server
+	charsWritten = send(socketFD, plainTextContents, strlen(plainTextContents), 0); // Write to the server
 	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
 	// if (charsWritten < strlen(plainTextContents)) printf("CLIENT: WARNING: Not all data written to socket!\n");
 
@@ -145,7 +134,7 @@ int main(int argc, char *argv[])
 
 	// printf("CLIENT: Length of string to be sent: %d\n", strlen(keyContents));
 	// Send message to server
-	charsWritten = sendAll(socketFD, keyContents, strlen(keyContents)); // Write to the server
+	charsWritten = send(socketFD, keyContents, strlen(keyContents), 0); // Write to the server
 	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
 	// if (charsWritten < strlen(keyContents)) printf("CLIENT: WARNING: Not all data written to socket!\n");
 

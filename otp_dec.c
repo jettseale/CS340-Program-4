@@ -9,17 +9,6 @@
 #include <stdbool.h>
 #include <limits.h>
 
-bool sendAll (int socket, void *buffer, size_t length) {
-	char* ptr = (char*)buffer;
-	while (length > 0) {
-		int i = send(socket, ptr, length, 0);
-        if (i < 1) return false;
-        ptr += i;
-        length -= i;
-	}
-	return true;
-}
-
 void error(const char *msg) { perror(msg); exit(0); } // Error function used for reporting issues
 
 int main(int argc, char *argv[])
@@ -119,7 +108,7 @@ int main(int argc, char *argv[])
 
 	// Send message to server
 	// printf("CLIENT: Length of string to be sent: %d\n", strlen(plainTextContents));
-	charsWritten = sendAll(socketFD, plainTextContents, strlen(plainTextContents)); // Write to the server
+	charsWritten = send(socketFD, plainTextContents, strlen(plainTextContents), 0); // Write to the server
 	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
 	// if (charsWritten < strlen(plainTextContents)) printf("CLIENT: WARNING: Not all data written to socket!\n");
 
@@ -129,7 +118,7 @@ int main(int argc, char *argv[])
 	if (charsRead < 0) error("CLIENT: ERROR reading from socket");
 	if (!strcmp(buffer, "I'm otp_enc_d.c")) {
 		fprintf(stderr, "ERROR: otp_dec.c cannot connect to otp_enc_d.c\nAttempted port: %d\n", portNumber);
-		charsWritten = sendAll(socketFD, "No connection for you, buddy", 28);
+		charsWritten = send(socketFD, "No connection for you, buddy", 28, 0);
 		if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
 		// if (charsWritten < 28) printf("CLIENT: WARNING: Not all data written to socket!\n");
 		close(socketFD);
@@ -138,7 +127,7 @@ int main(int argc, char *argv[])
 
 	// Send message to server
 	// printf("CLIENT: Length of string to be sent: %d\n", strlen(keyContents));
-	charsWritten = sendAll(socketFD, keyContents, strlen(keyContents)); // Write to the server
+	charsWritten = send(socketFD, keyContents, strlen(keyContents), 0); // Write to the server
 	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
 	// if (charsWritten < strlen(keyContents)) printf("CLIENT: WARNING: Not all data written to socket!\n");
 

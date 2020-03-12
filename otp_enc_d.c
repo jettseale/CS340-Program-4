@@ -9,17 +9,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-bool sendAll (int socket, void *buffer, size_t length) {
-	char* ptr = (char*)buffer;
-	while (length > 0) {
-		int i = send(socket, ptr, length, 0);
-        if (i < 1) return false;
-        ptr += i;
-        length -= i;
-	}
-	return true;
-}
-
 char encryptedText[70001];
 
 void encrypt (char plainText[70001], char keyText[70001]) {
@@ -102,7 +91,7 @@ int main(int argc, char *argv[]) {
 				while (1) {
 					// Get the message from the client and display it
 					memset(buffer, '\0', 70001);
-					charsRead = recv(establishedConnectionFD, buffer, 70001, 0); // Read the client's message from the socket
+					charsRead = recv(establishedConnectionFD, buffer, sizeof(buffer) - 1, 0); // Read the client's message from the socket
 					if (charsRead < 0) error("ERROR reading from socket");
 					if (charsRead == 0) break;
 					i++;
@@ -112,7 +101,7 @@ int main(int argc, char *argv[]) {
 						strcpy(plainText, buffer);
 						// printf("SERVER: Length of string copied: %d\n", strlen(plainText));
 						//Send a Success message back to the client
-						charsRead = sendAll(establishedConnectionFD, "I'm otp_enc_d.c", 15); // Send success back
+						charsRead = send(establishedConnectionFD, "I'm otp_enc_d.c", 15, 0); // Send success back
 						if (charsRead < 0) error("ERROR writing to socket");
 					} else if (i == 2) {
 						if (!strcmp(buffer, "No connection for you, buddy")) {
@@ -123,7 +112,7 @@ int main(int argc, char *argv[]) {
 						strcpy(keyText, buffer);
 						// printf("SERVER: Length of string copied: %d\n", strlen(keyText));
 						encrypt(plainText, keyText);
-						charsRead = sendAll(establishedConnectionFD, encryptedText, strlen(encryptedText));
+						charsRead = send(establishedConnectionFD, encryptedText, strlen(encryptedText), 0);
 						if (charsRead < 0) error("ERROR writing to socket");
 						break;
 					}
