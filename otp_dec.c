@@ -11,7 +11,7 @@
 
 void error(const char *msg) { perror(msg); exit(0); } // Error function used for reporting issues
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) //Start of main function
 {
 	// Check to make sure the correct number of arguments was entered
 	if (argc != 4) {
@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
 		exit(0);
 	}
 
+	//Create and initialize variables
 	int socketFD, portNumber, charsWritten, charsRead;
 	struct sockaddr_in serverAddress;
 	struct hostent* serverHostInfo;
@@ -107,10 +108,8 @@ int main(int argc, char *argv[])
 		error("CLIENT: ERROR connecting");
 
 	// Send message to server
-	// printf("CLIENT: Length of string to be sent: %d\n", strlen(plainTextContents));
 	charsWritten = send(socketFD, plainTextContents, strlen(plainTextContents), 0); // Write to the server
 	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
-	// if (charsWritten < strlen(plainTextContents)) printf("CLIENT: WARNING: Not all data written to socket!\n");
 
 	// // Get return message from server
 	memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer again for reuse
@@ -120,23 +119,20 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "ERROR: otp_dec.c cannot connect to otp_enc_d.c\nAttempted port: %d\n", portNumber);
 		charsWritten = send(socketFD, "No connection for you, buddy", 28, 0);
 		if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
-		// if (charsWritten < 28) printf("CLIENT: WARNING: Not all data written to socket!\n");
 		close(socketFD);
 		exit(2);
 	}
 
 	// Send message to server
-	// printf("CLIENT: Length of string to be sent: %d\n", strlen(keyContents));
 	charsWritten = send(socketFD, keyContents, strlen(keyContents), 0); // Write to the server
 	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
-	// if (charsWritten < strlen(keyContents)) printf("CLIENT: WARNING: Not all data written to socket!\n");
 
 	// Get return message from server
 	memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer again for reuse
 	charsRead = recv(socketFD, buffer, sizeof(buffer) - 1, 0); // Read data from the socket, leaving \0 at end
 	if (charsRead < 0) error("CLIENT: ERROR reading from socket");
 	
-	printf("%s\n", buffer);
+	printf("%s\n", buffer); //Print final result
 
 	close(socketFD); // Close the socket
 	

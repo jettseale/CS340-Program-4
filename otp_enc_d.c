@@ -9,39 +9,41 @@
 #include <stdbool.h>
 #include <string.h>
 
-char encryptedText[70001];
+char encryptedText[70001]; //Final encrypted text to be returned
 
+//Function that does the encryption:
 void encrypt (char plainText[70001], char keyText[70001]) {
 	int i = 0, textNum = 0, keyNum = 0, encryptNum = 0;
-	memset(encryptedText, '\0', 70001);
+	memset(encryptedText, '\0', 70001); //Clear out enrypted text string
 
-	for (i = 0; plainText[i]; i++) {
-		if (plainText[i] != ' ') {
-			textNum = ((int)plainText[i] - 65);
+	for (i = 0; plainText[i]; i++) { //Loop through the plain text
+		if (plainText[i] != ' ') { //If the char is anything but a space
+			textNum = ((int)plainText[i] - 65); //Convert to ascii value
 		} else {
-			textNum = ((int)plainText[i] - 6);
+			textNum = ((int)plainText[i] - 6); //Convert to ascii value
 		}
-		if (keyText[i] != ' ') {
+		if (keyText[i] != ' ') { //Do the same thing for the key
 			keyNum = ((int)keyText[i] - 65);
 		} else {
 			keyNum = ((int)keyText[i] - 6);
 		}
-		encryptNum = textNum + keyNum;
+		encryptNum = textNum + keyNum; //Add the key value to the plain text value
 		if (encryptNum > 26) {
-			encryptNum = encryptNum - 27;
+			encryptNum = encryptNum - 27; //If the addition ends up being more than 26, subtract 27
 		}
 		if (encryptNum != 26) {
-			encryptNum = encryptNum + 65;
+			encryptNum = encryptNum + 65; //Convert back from ascii values
 		} else {
-			encryptNum = encryptNum + 6;
+			encryptNum = encryptNum + 6; //Convert back from ascii values
 		}
-		encryptedText[i] = (char)encryptNum;
+		encryptedText[i] = (char)encryptNum; //Create encrypted text
 	}
 }
 
 void error(const char *msg) { perror(msg); exit(1); } // Error function used for reporting issues
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]) { //Start of main function
+	//Create and initialize variables
 	int listenSocketFD, establishedConnectionFD, portNumber, charsRead;
 	socklen_t sizeOfClientInfo;
 	char buffer[70001];
@@ -82,37 +84,33 @@ int main(int argc, char *argv[]) {
 		//Fork new child process
 		childPid = fork();
 		switch (childPid) {
-			case -1:
+			case -1: //If there's an error forking
 				error("ERROR forking");
 				break;
 		
-			case 0: 
+			case 0: //Child process code
 				i = 0;
 				while (1) {
 					// Get the message from the client and display it
-					memset(buffer, '\0', 70001);
+					memset(buffer, '\0', 70001); //Clear out buffer
 					charsRead = recv(establishedConnectionFD, buffer, sizeof(buffer) - 1, 0); // Read the client's message from the socket
 					if (charsRead < 0) error("ERROR reading from socket");
 					if (charsRead == 0) break;
-					i++;
-					if (i == 1) {
+					i++; //Increment how many times we've looped
+					if (i == 1) { //The first loop, corresponds with the plain text
 						memset(plainText, '\0', 70001);
-						// printf("SERVER: Length of string recieved: %d\n", strlen(buffer));
 						strcpy(plainText, buffer);
-						// printf("SERVER: Length of string copied: %d\n", strlen(plainText));
 						//Send a Success message back to the client
-						charsRead = send(establishedConnectionFD, "I'm otp_enc_d.c", 15, 0); // Send success back
+						charsRead = send(establishedConnectionFD, "I'm otp_enc_d.c", 15, 0); // Send ID back
 						if (charsRead < 0) error("ERROR writing to socket");
-					} else if (i == 2) {
+					} else if (i == 2) { //The second loop, corresponds with the key
 						if (!strcmp(buffer, "No connection for you, buddy")) {
-							break;
+							break; //Stop connection if connecting with wrong client
 						}
 						memset(keyText, '\0', 70001);
-						// printf("SERVER: Length of string recieved: %d\n", strlen(buffer));
 						strcpy(keyText, buffer);
-						// printf("SERVER: Length of string copied: %d\n", strlen(keyText));
-						encrypt(plainText, keyText);
-						charsRead = send(establishedConnectionFD, encryptedText, strlen(encryptedText), 0);
+						encrypt(plainText, keyText); //Encrypt
+						charsRead = send(establishedConnectionFD, encryptedText, strlen(encryptedText), 0); //Send it back
 						if (charsRead < 0) error("ERROR writing to socket");
 						break;
 					}
@@ -120,7 +118,7 @@ int main(int argc, char *argv[]) {
 				break;
 			
 			default:
-				waitpid(childPid, &childExitStatus, 0);
+				waitpid(childPid, &childExitStatus, 0); //Wait for child to finish
 				close(establishedConnectionFD); // Close the existing socket which is connected to the client
 				childPid = -5;
 				childExitStatus = -5;

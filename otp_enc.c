@@ -11,7 +11,7 @@
 
 void error(const char *msg) { perror(msg); exit(0); } // Error function used for reporting issues
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) //Start of main function
 {
 	// Check to make sure the correct number of arguments was entered
 	if (argc != 4) {
@@ -25,6 +25,7 @@ int main(int argc, char *argv[])
 		exit(0);
 	}
 
+	//Set up variables:
 	int socketFD, portNumber, charsWritten, charsRead;
 	struct sockaddr_in serverAddress;
 	struct hostent* serverHostInfo;
@@ -89,7 +90,7 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	//Make sure there are no bad characters
+	//Make sure there are no bad characters for the plain text
 	for (i = 0; i < strlen(plainTextContents); i++) {
 		if ((int)plainTextContents[i] > 90 || (int)plainTextContents[i] < 65 && (int)plainTextContents[i] != 32) {
 			fprintf(stderr, "ERROR: There are bad characters in the provided plain text file.\n");
@@ -97,6 +98,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	//Make sure there are no bad characters for the key
 	for (i = 0; i < strlen(keyContents); i++) {
 		if ((int)keyContents[i] > 90 || (int)keyContents[i] < 65 && (int)keyContents[i] != 32) {
 			fprintf(stderr, "ERROR: There are bad characters in the provided key file.\n");
@@ -121,29 +123,25 @@ int main(int argc, char *argv[])
 	if (connect(socketFD, (struct sockaddr*)&serverAddress, sizeof(serverAddress)) < 0) // Connect socket to address
 		error("CLIENT: ERROR connecting");
 
-	// printf("CLIENT: Length of string to be sent: %d\n", strlen(plainTextContents));
 	// Send message to server
 	charsWritten = send(socketFD, plainTextContents, strlen(plainTextContents), 0); // Write to the server
 	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
-	// if (charsWritten < strlen(plainTextContents)) printf("CLIENT: WARNING: Not all data written to socket!\n");
 
 	// // Get return message from server
 	memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer again for reuse
 	charsRead = recv(socketFD, buffer, sizeof(buffer) - 1, 0); // Read data from the socket, leaving \0 at end
 	if (charsRead < 0) error("CLIENT: ERROR reading from socket");
 
-	// printf("CLIENT: Length of string to be sent: %d\n", strlen(keyContents));
 	// Send message to server
 	charsWritten = send(socketFD, keyContents, strlen(keyContents), 0); // Write to the server
 	if (charsWritten < 0) error("CLIENT: ERROR writing to socket");
-	// if (charsWritten < strlen(keyContents)) printf("CLIENT: WARNING: Not all data written to socket!\n");
 
 	// Get return message from server
 	memset(buffer, '\0', sizeof(buffer)); // Clear out the buffer again for reuse
 	charsRead = recv(socketFD, buffer, sizeof(buffer) - 1, 0); // Read data from the socket, leaving \0 at end
 	if (charsRead < 0) error("CLIENT: ERROR reading from socket");
 	
-	printf("%s\n", buffer);
+	printf("%s\n", buffer); //Print the final result
 
 	close(socketFD); // Close the socket
 	
